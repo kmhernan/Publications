@@ -29,7 +29,8 @@ def main():
     	inbest.tab  - Tab delimited output from Blast Parser
         infasta.fa  - The Foxtail reference
         outfasta.fa - The output file for the cut Foxtail reference.
-    """ cut_dict = get_cut_sites()
+    """ 
+    cut_dict = get_cut_sites()
     process_reference(cut_dict)
 
 def get_cut_sites():
