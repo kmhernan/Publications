@@ -21,6 +21,9 @@ def main():
     print_ktype(dat)
 
 def load_ref():
+    """
+    Loads the reference fasta file into a dictionary
+    """
     dic = {}
     ref_init = reference.Reference(handle=reffil)
     for r in ref_init:
