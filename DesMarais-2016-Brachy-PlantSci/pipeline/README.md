@@ -38,8 +38,20 @@ java -Xmx1G -Xmx2G -XX:ParallelGCThreads=2 -jar $picard AddOrReplaceReadGroups I
 Filtered and sorted alignments were processed according to the 
 [GATK's Best Practices](https://www.broadinstitute.org/gatk/guide/best-practices.php) (v3.4-46). 
 
-```
+```bash
+# Get targets
+java -Xmx2G -Xmx4G -XX:ParallelGCThreads=2 -jar $gatk -T RealignerTargetCreator \
+    -R $reference \
+    -I $rg_bam \
+    -nt 2 \
+    -o $targets_intervals
 
+# Realign
+java -Xmx2G -Xmx4G -XX:ParallelGCThreads=2 -jar $gatk -T IndelRealigner \
+    -R $reference \
+    -I $rg_bam \
+    -o $realigned_bam \
+    --targetIntervals $targets_intervals
 ```
 
 Since there is currently
