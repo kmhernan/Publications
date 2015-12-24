@@ -95,3 +95,17 @@ java -Xms2G -Xmx4G -jar $gatk -T PrintReads \
     -I $realigned_bam \
     -o $recalibrated.bam
 ```
+
+## Step 03: Detect SNPs with Freebayes
+
+We used [Freebayes](https://github.com/ekg/freebayes) (v0.9.21-19-gc003c1e) to detect variants in the mapping population.
+
+```bash
+# Run freebayes
+freebayes -f $reference -L $recal_bam_list_file -v $raw_vcf \
+    -m 10 -q 5 --genotype-qualities --use-mapping-quality \
+    --site-selection-max-iterations 3 --genotyping-max-iterations 25 \
+    --min-alternate-count 2 --min-alternate-qsum 40 \
+    --genotype-variant-threshold 4
+```
+
