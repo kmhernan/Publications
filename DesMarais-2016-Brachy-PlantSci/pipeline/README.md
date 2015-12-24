@@ -18,6 +18,6 @@ Alignments were filtered to remove unmapped reads and low quality (< 10) alignme
 ```
 # Alignment and filtering command-line
 gmapper-cs -N 4 -L <reference> --sam-header-rg <sam_header.txt> <filtered.fastq> \
-    | sambamba view -S -o <filtered.bam> -f bam -F "not unmapped and mapping_quality > 10" /dev/stdin && \
-    sambamba sort -o <sorted.bam> -t 4 -m 2GB --tmpdir=<tmp_directory> <filtered.bam>
+    | sambamba view -S -o <filtered.bam> -f bam -F "not unmapped and mapping_quality > 10" /dev/stdin \
+    && sambamba sort -o <sorted.bam> -t 4 -m 2GB --tmpdir=<tmp_directory> <filtered.bam>
 ```
