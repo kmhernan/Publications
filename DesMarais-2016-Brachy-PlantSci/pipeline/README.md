@@ -54,5 +54,27 @@ java -Xmx2G -Xmx4G -XX:ParallelGCThreads=2 -jar $gatk -T IndelRealigner \
     --targetIntervals $targets_intervals
 ```
 
-Since there is currently
-no source for high quality SNPs in the v3.0 genome, we followed 
+Since there is currently no source for high quality SNPs in the v3.0 genome, we first ran all of the indel realigned bams through 
+a single run of the GATK's UnifiedGenotyper. Then, we pulled out the top quality SNPs and used those to run the base quality
+recalibration step.
+
+```bash
+# Run UnifiedGenotyper
+java -Xms10G -Xmx25G -XX:ParallelGCThreads=2 -jar $gatk -T UnifiedGenotyper \
+    -nct 4 -nt 4 \
+    -I $bam_file_list \
+    -stand_call_conf 20.0 \
+    -stand_emit_conf 20.0 \
+    -glm SNP \
+    -gt_mode DISCOVERY \
+    -R $ref -L $chrom -o $raw_vcf
+
+# Run basic filters
+java -Xmx8G -Xmx10G -XX:ParallelGCThreads=2 -jar $gatk -T VariantFiltration \
+    -V $raw_vcf \
+    -R $reference \
+    -L $chrom \
+    -o $filtered_vcf \
+    --filterExpression "QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" \
+    --filterName "BigFilter"
+```
