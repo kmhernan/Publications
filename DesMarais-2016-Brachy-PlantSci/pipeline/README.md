@@ -77,4 +77,21 @@ java -Xmx8G -Xmx10G -XX:ParallelGCThreads=2 -jar $gatk -T VariantFiltration \
     -o $filtered_vcf \
     --filterExpression "QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" \
     --filterName "BigFilter"
+
+# Get top quality SNPs using the GetHighQualSNPs.py script in this repository
+GetHighQualSNPs.py $filtered_vcf $top_vcf
+
+# Recalibration
+java -Xms2G -Xmx4G -jar $gatk -T BaseRecalibrator \
+    -R $reference \
+    -I $realigned_bam \
+    -knownSites $top_vcf
+    -o $recal_table
+
+# Apply Recalibration
+java -Xms2G -Xmx4G -jar $gatk -T PrintReads \
+    -R $reference \
+    -BQSR $recal_table \
+    -I $realigned_bam \
+    -o $recalibrated.bam
 ```
