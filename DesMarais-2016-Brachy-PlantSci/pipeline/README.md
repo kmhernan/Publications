@@ -109,7 +109,7 @@ freebayes -f $reference -L $recal_bam_list_file -v $raw_vcf \
     --min-alternate-count 2 --min-alternate-qsum 40 \
     --genotype-variant-threshold 4
 
-# Get biallelic loci
+# Get biallelic loci and remove loci with QUAL < 15
 cat $raw_vcf | awk -F"\t" '{if($1~/^#/){print $0}else if($4!~/,/ && $5!~/,/ && $6>=15){print $0}}' > $biallelic_vcf
 
 # Normalize
