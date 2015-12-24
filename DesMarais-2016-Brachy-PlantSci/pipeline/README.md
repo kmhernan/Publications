@@ -98,7 +98,8 @@ java -Xms2G -Xmx4G -jar $gatk -T PrintReads \
 
 ## Step 03: Detect SNPs with Freebayes
 
-We used [Freebayes](https://github.com/ekg/freebayes) (v0.9.21-19-gc003c1e) to detect variants in the mapping population.
+We used [Freebayes](https://github.com/ekg/freebayes) (v0.9.21-19-gc003c1e) to detect variants in the mapping population. All
+multi-allelelic loci were removed and variants were normalized using [Vt](http://genome.sph.umich.edu/wiki/Vt) (v0.5).
 
 ```bash
 # Run freebayes
@@ -107,5 +108,11 @@ freebayes -f $reference -L $recal_bam_list_file -v $raw_vcf \
     --site-selection-max-iterations 3 --genotyping-max-iterations 25 \
     --min-alternate-count 2 --min-alternate-qsum 40 \
     --genotype-variant-threshold 4
+
+# Get biallelic loci
+cat $raw_vcf | awk -F"\t" '{if($1~/^#/){print $0}else if($4!~/,/ && $5!~/,/ && $6>=15){print $0}}' > $biallelic_vcf
+
+# Normalize
+vt normalize -o $biallelic_normalized_vcf -r $reference $biallelic_vcf
 ```
 
