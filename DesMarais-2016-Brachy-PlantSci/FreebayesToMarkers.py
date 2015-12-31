@@ -28,17 +28,29 @@ Usage:
 """
 
 def getGenotype(d, g):
+    '''
+    Parses out the genotype call and applies GQ filter of 8
+    '''
     curr = dict(zip(d, g.split(':')))
     if curr['GT'] == '.': return None
     elif int(curr['GQ']) < 8: return None
     else: return curr['GT']
 
 def is_het(g):
+    '''
+    Boolean test for whether or not the genotype is a het
+    '''
     if g and g[0] != g[-1]: return True
     else: return False
 
 def getMarkers(pa, pb, gts):
+    '''
+    Converts the RIL genotype calls into the A/B markers based on the parental
+    genotypes. Missing parental information is inferred where possible.
+    '''
     curr = []
+
+    # Both parents are genotyped
     if pa and pb:
         for g in gts:
             if g is None: curr.append('N')
@@ -46,6 +58,8 @@ def getMarkers(pa, pb, gts):
             elif g == pb: curr.append('B')
             elif is_het(g): curr.append('H')
             else: curr.append('N')
+
+    # Only parent A is genotyped and is the reference, which it should be
     elif pa and pa == '0/0':
         for g in gts:
             if g is None: curr.append('N')
@@ -53,6 +67,8 @@ def getMarkers(pa, pb, gts):
             elif is_het(g): curr.append('H')
             elif g == '1/1': curr.append('B')
             else: curr.append('N')
+
+    # Only parent B is genotyped and is alt
     elif pb and pb == '1/1':
         for g in gts:
             if g is None: curr.append('N')
@@ -60,6 +76,8 @@ def getMarkers(pa, pb, gts):
             elif is_het(g): curr.append('H')
             elif g == '0/0': curr.append('A')
             else: curr.append('N')
+
+    # Both parents are missing, assume parent A is the reference
     elif pa is None and pb is None:
         for g in gts:
             if g is None: curr.append('N')
@@ -67,6 +85,8 @@ def getMarkers(pa, pb, gts):
             elif is_het(g): curr.append('H')
             elif g == '1/1': curr.append('B')
             else: curr.append('N')
+
+    # Return the marker calls
     return curr
 
 
@@ -98,10 +118,17 @@ if __name__ == '__main__':
             else:
                 dat = dict(zip(head, line.rstrip().split('\t')))
                 fmt = dat['FORMAT'].split(':')
+
+                # Extract the parental genotypes
                 pgt_A = getGenotype(fmt, dat[parentA])
                 pgt_B = getGenotype(fmt, dat[parentB])
+
+                # Extract the RIL genotypes
                 gt_calls = [getGenotype(fmt, dat[i]) for i in samples]
+
+                # Call markers
                 markers = []
+
                 if is_het(pgt_A) or is_het(pgt_B): continue
                 elif (pgt_A and pgt_B) and (pgt_A == pgt_B): continue
                 else:
