@@ -116,3 +116,15 @@ cat $raw_vcf | awk -F"\t" '{if($1~/^#/){print $0}else if($4!~/,/ && $5!~/,/ && $
 vt normalize -o $biallelic_normalized_vcf -r $reference $biallelic_vcf
 ```
 
+## Step 04: Marker Calling and Filtering
+
+The biallelic, normalized variants from __Step 02__ were used to determine which parent contributed the alleles. Genotypes 
+were converted to A/B/H calls and then filtered to remove likely uninformative markers.
+
+```bash
+# Call markers
+FreebayesToMarkers.py $biallelic_normalized_vcf $raw_markers_txt
+
+# Filter markers
+FilterMarkers.py $raw_markers_txt $filtered_markers_txt
+```
