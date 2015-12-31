@@ -128,3 +128,15 @@ FreebayesToMarkers.py $biallelic_normalized_vcf $raw_markers_txt
 # Filter markers
 FilterMarkers.py $raw_markers_txt $filtered_markers_txt
 ```
+
+## Step 05: Updating Cui Marker Locations
+
+Since the Cui markers were aligned to the older version of the _B. distachyon_ genome, the flanking sequence from the markers
+were aligned to the new genome using [blastn](http://www.ncbi.nlm.nih.gov/books/NBK279690/) (v2.2.31).
+
+```bash
+# Blast Cui markers to new assembly
+$blastn -db $dbname -query $cui_markers_fasta \
+-out $cui_markers_update_txt \
+-outfmt 7 -num_alignments 10 -num_threads 4
+```
