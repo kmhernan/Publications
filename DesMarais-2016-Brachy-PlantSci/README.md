@@ -132,11 +132,15 @@ FilterMarkers.py $raw_markers_txt $filtered_markers_txt
 ## Step 05: Updating Cui Marker Locations
 
 Since the Cui markers were aligned to the older version of the _B. distachyon_ genome, the flanking sequence from the markers
-were aligned to the new genome using [blastn](http://www.ncbi.nlm.nih.gov/books/NBK279690/) (v2.2.31).
+were aligned to the new genome using [blastn](http://www.ncbi.nlm.nih.gov/books/NBK279690/) (v2.2.31). Then, the top unique hits
+were extracted into a bed format for further analysis.
 
 ```bash
 # Blast Cui markers to new assembly
 $blastn -db $dbname -query $cui_markers_fasta \
 -out $cui_markers_update_txt \
 -outfmt 7 -num_alignments 10 -num_threads 4
+
+# Get top unique hits
+ParseBlast.py $cui_markers_update_txt $cui_markers_best_bed
 ```
